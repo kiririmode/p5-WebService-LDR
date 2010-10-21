@@ -43,7 +43,19 @@ sub new {
     $self;
 }
 
+# ================================================================================
+package WebService::LDR::Response::Unsubscribe;
+use base qw/Class::Accessor::Fast/;
+our @accessors = qw/ErrorCode isSuccess/;
+__PACKAGE__->mk_accessors( @accessors );
 
-
+sub new {
+    my ($class, $h) = @_;
+    my $self = bless {}, shift;
+    for my $ac (@accessors) {
+        $self->$ac( $h->{$ac} );
+    }
+    $self;
+}
 
 1;

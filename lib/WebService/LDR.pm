@@ -83,16 +83,18 @@ sub auto_discovery {
 
 sub subscribe {
     my ($self, $feedlink) = @_;
-    my $json = $self->_request( '/feed/subscribe' => { feedlink => $feedlink } );
 
-    WebService::LDR::Response::Subscribe->new( $json );
+    WebService::LDR::Response::Subscribe->new( 
+        $self->_request( '/feed/subscribe' => { feedlink => $feedlink } )
+    );
 }
 
 sub unsubscribe {
     my ($self, $sid ) = @_;
-    my $json = $self->_request( '/feed/unsubscribe' => { subscribe_id => $sid } );
 
-    print Dumper $json;
+    WebService::LDR::Response::Unsubscribe->new( 
+        $self->_request( '/feed/unsubscribe' => { subscribe_id => $sid } )
+    );
 }
 
 sub _request {

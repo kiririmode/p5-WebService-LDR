@@ -2,6 +2,142 @@ package WebService::LDR;
 
 use warnings;
 use strict;
+use WWW::Mechanize;
+use base qw/Class::Accessor::Fast/;
+use Carp qw//;
+use JSON qw/from_json/;
+use Data::Dumper;
+use Encode;
+use WebService::LDR::Response;
+use Try::Tiny;
+
+__PACKAGE__->mk_accessors( qw/apiKey/ );
+
+# TODO: cache response
+
+my $DEBUG;
+
+my $urls = {
+    login   => 'https://member.livedoor.com/login/',
+    base    => 'http://reader.livedoor.com/api',
+};
+
+sub new {
+    my ($class, %args) = @_;
+
+    _init( %args );
+    my $mech_conf = delete $args{mech} || [];
+
+    my $self = bless {
+        user   => delete $args{user},
+        pass   => delete $args{pass},
+        mech   => WWW::Mechanize->new( @$mech_conf ),
+    }, $class;
+    $DEBUG = 1 if $args{debug};
+
+    $self;
+}
+
+sub _init {
+    my (%args) = @_;
+
+    my $user = $args{user};
+    my $pass = $args{pass};
+    for my $param ($user, $pass) {
+        $param or Carp::croak "username and/or password is missing\n";
+    }
+
+    $DEBUG = $args{debug};
+}
+
+sub login {
+    my ($self) = @_;
+
+    $self->{mech}->get( $urls->{login} );
+    if ( $self->{mech}->content =~ /name="loginForm"/ ) {
+
+        $DEBUG && debug( "submit form to login as an user=[", $self->{user}, "]" );
+        $self->{mech}->submit_form( 
+            form_name => 'loginForm',
+            fields => {
+                livedoor_id => $self->{user},
+                password    => $self->{pass},
+            }
+        );
+        if ( $self->{mech}->content =~ /class="error-messages"/ ) {
+            $DEBUG && debug( "login failed" );
+            Carp::croak "Failed to login LivedoorReader";
+        }
+        else {
+            $DEBUG && debug( "login success" );
+        }
+    }
+}
+
+sub auto_discovery {
+    my ($self, $url) = @_;
+    my $json = $self->_request( '/feed/discover' => { url => $url } );
+
+    map { WebService::LDR::Response::Discovery->new( $_ ) } @$json;
+}
+
+sub subscribe {
+    my ($self, $feedlink) = @_;
+    my $json = $self->_request( '/feed/subscribe' => { feedlink => $feedlink } );
+
+    WebService::LDR::Response::Subscribe->new( $json );
+}
+
+sub unsubscribe {
+    my ($self, $sid ) = @_;
+    my $json = $self->_request( '/feed/unsubscribe' => { subscribe_id => $sid } );
+
+    print Dumper $json;
+}
+
+sub _request {
+    my ($self, $api, $opt) = @_;
+
+    my $url = $urls->{base} . $api;
+    $DEBUG && debug("POSTing $url ... with ApiKey[", $self->apiKey, "]");
+
+    my $res;
+    try {
+        $res = $self->{mech}->post( $url => {
+            %$opt,
+            ApiKey => $self->apiKey,
+        });
+    } finally {
+        $DEBUG && debug("POST response status=[", $self->{mech}->status, "]");
+    };
+
+    $self->_parse_cookie_apikey() unless $self->apiKey;
+    if ( ! $res || ! $res->is_success ) {
+        Carp::croak "POST failed. status=[", $self->{mech}->status, "] status line=[", $res->status_line, "]";
+    }
+    
+    from_json( $self->{mech}->content, { utf8 => 0 } );
+}
+
+sub _parse_cookie_apikey {
+    my ($self) = @_;
+    
+    $self->{mech}->cookie_jar->scan( sub {
+        my ($key, $val) = @_[1,2];
+        if ( $key =~ /reader_sid$/ ) {
+            $self->apiKey( $val );
+
+            $DEBUG && debug("apiKey=[$val]");
+            return;
+        }
+    } );
+}
+
+sub debug {
+    print "[DEBUG] ", @_, "\n" if @_;
+}
+
+
 
 =head1 NAME
 
@@ -37,9 +173,6 @@ if you don't export anything, such as for a purely object-oriented module.
 =head2 function1
 
 =cut
-
-sub function1 {
-}
 
 =head2 function2
 

@@ -15,8 +15,17 @@ sub new {
         if ( $ac =~ /link|icon/ ) {
             $self->$ac( URI->new($h->{$ac}) );
         }
-        elsif ( $ac eq 'modified_on' ) {
+        elsif ( $ac =~ /_on$|expires/ ) {
             $self->$ac( DateTime->from_epoch( epoch => $h->{$ac} ));
+        }
+        elsif ( $ac eq 'channel' ) {
+            $self->$ac( WebService::LDR::Response::Channel->new( $h->{$ac} ) );
+        }
+        elsif ( $ac eq 'items' ) {
+            $self->$ac([ 
+                map { WebService::LDR::Response::Item->new( $_ ) }
+                    @{ $h->{$ac} }
+            ]);
         }
         else {
             $self->$ac( $h->{$ac} );
@@ -57,5 +66,32 @@ sub accessors {
 }
 __PACKAGE__->mk_accessors( accessors() );
 
-1;
+# ================================================================================
+package WebService::LDR::Response::Unread;
+use base qw/WebService::LDR::Response/;
 
+# last_stored_on isn't necessary parameter.
+sub accessors {
+    qw/subscribe_id last_stored_on channel items/
+}
+__PACKAGE__->mk_accessors( accessors() );
+
+# ================================================================================
+package WebService::LDR::Response::Channel;
+use base qw/WebService::LDR::Response/;
+
+sub accessors {
+    qw/link icon description image title feedlink subscribers_count expires/
+}
+__PACKAGE__->mk_accessors( accessors() );
+
+# ================================================================================
+package WebService::LDR::Response::Item;
+use base qw/WebService::LDR::Response/;
+
+sub accessors {
+    qw/link enclosure enclosure_type author body created_on modified_on category title id/
+}
+__PACKAGE__->mk_accessors( accessors() );
+
+1;

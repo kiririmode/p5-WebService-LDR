@@ -1,7 +1,7 @@
 #!perl -T
 use strict;
 use warnings;
-use Test::More tests => 12;
+use Test::More tests => 11;
 use Test::Exception;
 use Scalar::Util qw/looks_like_number/;
 
@@ -36,7 +36,6 @@ sub success_case {
     my $link = $links[0];
     isa_ok( $link->link, 'URI::http' );
     isa_ok( $link->feedlink, 'URI::http' );
-    ok( looks_like_number( $link->subscribe_id ), 'subscribe_id is number' );
     ok( $link->title, 'title is not null' );
     ok( looks_like_number( $link->subscribers_count ), 'subscribers_count is number' );
 }

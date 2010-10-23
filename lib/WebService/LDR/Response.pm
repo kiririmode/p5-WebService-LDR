@@ -5,7 +5,6 @@ use strict;
 use base qw/Class::Accessor::Fast/;
 use URI;
 use DateTime;
-use Carp qw//;
 use Data::Dumper;
 
 sub new {
@@ -28,7 +27,7 @@ sub new {
 
 # ================================================================================
 package WebService::LDR::Response::Discovery;
-use base qw/WebService::LDR::Response Class::Accessor::Fast/;
+use base qw/WebService::LDR::Response/;
 sub accessors {
     qw/link subscribe_id title feedlink subscribers_count/
 }
@@ -36,7 +35,7 @@ __PACKAGE__->mk_accessors( accessors() );
 
 # ================================================================================
 package WebService::LDR::Response::Subscribe;
-use base qw/WebService::LDR::Response Class::Accessor::Fast/;
+use base qw/WebService::LDR::Response/;
 sub accessors {
     qw/subscribe_id ErrorCode isSuccess/
 }
@@ -44,14 +43,14 @@ __PACKAGE__->mk_accessors( accessors() );
 
 # ================================================================================
 package WebService::LDR::Response::Unsubscribe;
-use base qw/WebService::LDR::Response Class::Accessor::Fast/;
+use base qw/WebService::LDR::Response/;
 sub accessors { qw/ErrorCode isSuccess/ }
 __PACKAGE__->mk_accessors( accessors() );
 
 # ================================================================================
 package WebService::LDR::Response::Feed;
 
-use base qw/WebService::LDR::Response Class::Accessor::Fast/;
+use base qw/WebService::LDR::Response/;
 sub accessors {
     qw/icon link subscribe_id unread_count tags folder rate modified_on 
        public title subscribers_count feedlink/

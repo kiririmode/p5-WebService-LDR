@@ -34,8 +34,8 @@ SKIP: {
         isa_ok( $feed, 'WebService::LDR::Response::Feed' );
         can_ok( $feed, qw/icon link subscribe_id unread_count tags folder 
                           rate modified_on public title subscribers_count feedlink/ );
-        isa_ok( $feed->icon, 'URI::http' );
-        isa_ok( $feed->link, 'URI::http' );
+        isa_ok( $feed->icon, 'URI' );
+        isa_ok( $feed->link, 'URI' );
         ok( looks_like_number($feed->subscribe_id), 'subscribe_id is a number' );
         ok( looks_like_number($feed->unread_count), 'unread_count is a number' );
         isa_ok( $feed->tags, 'ARRAY' );
@@ -45,7 +45,7 @@ SKIP: {
         isa_ok( $feed->modified_on, 'DateTime' );
         ok( $feed->title, 'title is not null' );
         ok( looks_like_number($feed->subscribers_count), 'subscribers_count is a number' );
-        isa_ok( $feed->feedlink, 'URI::http' );
+        isa_ok( $feed->feedlink, 'URI' );
         $cnt += 13;
     }
 }

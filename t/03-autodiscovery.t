@@ -34,8 +34,8 @@ sub success_case {
     isa_ok( $links[0], 'WebService::LDR::Response::Discovery' );
 
     my $link = $links[0];
-    isa_ok( $link->link, 'URI::http' );
-    isa_ok( $link->feedlink, 'URI::http' );
+    isa_ok( $link->link, 'URI' );
+    isa_ok( $link->feedlink, 'URI' );
     ok( $link->title, 'title is not null' );
     ok( looks_like_number( $link->subscribers_count ), 'subscribers_count is number' );
 }

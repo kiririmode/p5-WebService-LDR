@@ -97,6 +97,20 @@ sub unsubscribe {
     );
 }
 
+sub get_feed_all {
+    my ($self) = @_;
+
+    map { WebService::LDR::Response::Feed->new($_) } 
+        @{ $self->_request( '/subs' => { unread => 0 } ) };
+}
+
+sub get_feed_unread {
+    my ($self) = @_;
+
+    map { WebService::LDR::Response::Feed->new($_) } 
+        @{ $self->_request( '/subs' => { unread => 0 } ) };
+}
+
 sub _request {
     my ($self, $api, $opt) = @_;
 

@@ -4,6 +4,7 @@ use warnings;
 use strict;
 use base qw/Class::Accessor::Fast/;
 use URI;
+use DateTime;
 use Carp qw//;
 
 
@@ -58,4 +59,30 @@ sub new {
     $self;
 }
 
+# ================================================================================
+package WebService::LDR::Response::Feed;
+
+use base qw/Class::Accessor::Fast/;
+our @accessors = qw/icon link subscribe_id unread_count tags folder rate modified_on public title subscribers_count feedlink/;
+__PACKAGE__->mk_accessors( @accessors );
+
+sub new {
+    my ($class, $h) = @_;
+
+    my $self = bless {}, shift;
+    for my $ac (@accessors) {
+        if ( $ac =~ /link|icon/ ) {
+            $self->$ac( URI->new($h->{$ac}) );
+        }
+        elsif ( $ac eq 'modified_on' ) {
+            $self->$ac( DateTime->from_epoch( epoch => $h->{$ac} ));
+        }
+        else {
+            $self->$ac( $h->{$ac} );
+        }
+    }
+    $self;
+};
+
 1;
+

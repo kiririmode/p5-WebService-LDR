@@ -13,8 +13,6 @@ use Try::Tiny;
 
 __PACKAGE__->mk_accessors( qw/apiKey/ );
 
-# TODO: cache response
-
 my $DEBUG;
 
 my $urls = {

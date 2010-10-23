@@ -80,24 +80,41 @@ sub login {
 
 sub auto_discovery {
     my ($self, $url) = @_;
-    my $json = $self->_request( '/feed/discover' => { url => $url } );
 
+    my $json = $self->_request( '/feed/discover' => { url => "$url" } );
     map { WebService::LDR::Response::Discovery->new( $_ ) } @$json;
 }
 
 sub subscribe {
-    my ($self, $feedlink) = @_;
+    my ($self, $link) = @_;
+
+    my @discovered = $self->auto_discovery($link) or do {
+        $DEBUG && debug("cannot discover feed on $link");
+        return;
+    };
 
     WebService::LDR::Response::Subscribe->new( 
-        $self->_request( '/feed/subscribe' => { feedlink => $feedlink } )
+        $self->_request( '/feed/subscribe' => { feedlink => $discovered[0]->feedlink->as_string } )
     );
 }
 
 sub unsubscribe {
-    my ($self, $sid ) = @_;
+    my ($self, $arg ) = @_;
+
+    $arg or Carp::croak("arg is undefined");
+
+    my $subscribe_id = $arg;
+    my @discovered;
+    if ( ! looks_like_number($arg) ) {
+        @discovered= $self->auto_discovery($arg) or do {
+            $DEBUG && debug("cannot discover feed on $arg");
+            return;
+        };
+        $subscribe_id = $discovered[0]->subscribe_id;
+    }
 
     WebService::LDR::Response::Unsubscribe->new( 
-        $self->_request( '/feed/unsubscribe' => { subscribe_id => $sid } )
+        $self->_request( '/feed/unsubscribe' => { subscribe_id => $subscribe_id } )
     );
 }
 

@@ -25,7 +25,7 @@ SKIP: {
     can_ok( $ldr, qw/subscribe unsubscribe/ );
     my @links = $ldr->auto_discovery( 'http://d.hatena.ne.jp/kiririmode/rss' );
     cmp_ok( scalar @links, '>', 0, 'auto_discovery returns valid feed info' );
-    $ldr->unsubscribe( $links[0]->subscribe_id );
+    $ldr->unsubscribe( $links[0]->link );
 
     my $ret = $ldr->subscribe($rss);
     isa_ok( $ret, 'WebService::LDR::Response::Subscribe' );
@@ -38,7 +38,7 @@ SKIP: {
     cmp_ok( $ret2->isSuccess, '==', 0, 'duplicate subscription is prohibited' );
     ok( $ret2->ErrorCode, 'duplicate subscription returns errorcode' );
 
-    my $ret3 = $ldr->unsubscribe($ret->subscribe_id);
+    my $ret3 = $ldr->unsubscribe($links[0]->link);
     isa_ok( $ret3, 'WebService::LDR::Response::Unsubscribe' );
     can_ok( $ret, qw/ErrorCode isSuccess/ );
     ok( $ret3->isSuccess, 'unsubscribe sccess' );

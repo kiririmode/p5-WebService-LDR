@@ -70,6 +70,7 @@ sub login {
             $DEBUG && debug( "login success" );
         }
     }
+    $self;
 }
 
 sub auto_discovery {

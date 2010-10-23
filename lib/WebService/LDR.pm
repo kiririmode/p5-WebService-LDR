@@ -112,17 +112,24 @@ sub get_feed_unread {
 sub get_unread_of {
     my ($self, $arg) = @_;
 
+    my $subscribe_id = $self->_subscribe_id($arg);
+    WebService::LDR::Response::Unread->new(
+        $self->_request( '/unread' => { subscribe_id => $subscribe_id } )
+    );
+}
+
+sub _subscribe_id {
+    my ($self, $arg) = @_;
+    
     if ( ref $arg ) {
         if ( $arg->can('subscribe_id') ) { 
-            return $self->get_unread_of( $arg->subscribe_id );
+            return $arg->subscribe_id;
         }
         else { Carp::croak "argument cannot call subscribe_id! "; }
     }
-
-    WebService::LDR::Response::Unread->new(
-        $self->_request( '/unread' => { subscribe_id => $arg } )
-    );
+    $arg;
 }
+
 
 sub _request {
     my ($self, $api, $opt) = @_;

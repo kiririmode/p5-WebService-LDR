@@ -9,6 +9,7 @@ use JSON qw/from_json/;
 use Data::Dumper;
 use Encode;
 use WebService::LDR::Response;
+use Scalar::Util qw/looks_like_number/;
 use Try::Tiny;
 
 __PACKAGE__->mk_accessors( qw/apiKey/ );
@@ -31,7 +32,11 @@ sub new {
         pass   => delete $args{pass},
         mech   => WWW::Mechanize->new( @$mech_conf ),
     }, $class;
-    $DEBUG = 1 if $args{debug};
+
+    if ( $args{debug} ) {
+        require Data::Dumper;
+        $DEBUG = 1;
+    }
 
     $self;
 }
@@ -136,7 +141,7 @@ sub _request {
     my ($self, $api, $opt) = @_;
 
     my $url = $urls->{base} . $api;
-    $DEBUG && debug("POSTing $url ... with ApiKey[", $self->apiKey, "]");
+    $DEBUG && debug("POSTing $url with ", Data::Dumper::Dumper($opt));
 
     my $res;
     try {
@@ -153,7 +158,9 @@ sub _request {
         Carp::croak "POST failed. status=[", $self->{mech}->status, "] status line=[", $res->status_line, "]";
     }
     
-    from_json( $self->{mech}->content, { utf8 => 0 } );
+    my $json = from_json( $self->{mech}->content, { utf8 => 0 } );
+    $DEBUG && debug("$api returns ", Data::Dumper::Dumper($json));
+    $json;
 }
 
 sub _parse_cookie_apikey {

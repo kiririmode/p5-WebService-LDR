@@ -158,10 +158,16 @@ sub get_all_of {
 
 sub _subscribe_id {
     my ($self, $arg) = @_;
-    
+
+    unless( defined $arg ) {
+        Carp::croak "argument isn't defined";
+    }
+
     if ( ref $arg ) {
         if ( $arg->can('subscribe_id') ) { 
-            return $arg->subscribe_id;
+            return defined $arg->subscribe_id
+                ? $arg->subscribe_id
+                : Carp::croak( "subscribe_id isn't defined" );
         }
         else { Carp::croak "argument cannot call subscribe_id! "; }
     }

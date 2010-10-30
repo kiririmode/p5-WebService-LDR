@@ -158,6 +158,15 @@ sub get_all_of {
     );
 }
 
+sub read {
+    my ($self, $arg) = @_;
+
+    my $subscribe_id = $self->_subscribe_id($arg);
+    WebService::LDR::Response::Result->new(
+        $self->_request('/touch_all' => { subscribe_id => $subscribe_id })
+    );
+}
+
 sub _subscribe_id {
     my ($self, $arg) = @_;
     $self->_extract($arg, "subscribe_id");

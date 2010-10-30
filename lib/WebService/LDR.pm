@@ -226,7 +226,7 @@ sub _request {
     my $res;
     try {
         $res = $self->{mech}->post( $url => {
-            %$opt,
+            $opt? %$opt : (),
             ApiKey => $self->apiKey,
         });
     } finally {

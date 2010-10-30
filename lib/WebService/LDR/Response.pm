@@ -5,7 +5,6 @@ use strict;
 use base qw/Class::Accessor::Fast/;
 use URI;
 use DateTime;
-use Data::Dumper;
 
 sub new {
     my ($class, $h) = @_;

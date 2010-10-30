@@ -12,13 +12,13 @@ sub new {
 
     my $self = bless {}, $class;
     for my $ac ( $class->accessors() ) {
-        if ( $ac =~ /link|icon/ ) {
+        if ( $ac =~ /link|icon/ && $h->{$ac} ) {
             $self->$ac( URI->new($h->{$ac}) );
         }
-        elsif ( $ac =~ /_on$|expires/ ) {
-            $self->$ac( DateTime->from_epoch( epoch => $h->{$ac} ));
+        elsif ( $ac =~ /_on$|expires/ && $h->{$ac} ) {
+            $self->$ac( DateTime->from_epoch( epoch => $h->{$ac} ))
         }
-        elsif ( $ac eq 'channel' ) {
+        elsif ( $ac eq 'channel' && $h->{$ac} ) {
             $self->$ac( WebService::LDR::Response::Channel->new( $h->{$ac} ) );
         }
         elsif ( $ac eq 'items' ) {

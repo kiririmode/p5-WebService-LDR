@@ -136,8 +136,23 @@ sub get_unread_of {
     my ($self, $arg) = @_;
 
     my $subscribe_id = $self->_subscribe_id($arg);
-    WebService::LDR::Response::Unread->new(
+    WebService::LDR::Response::Article->new(
         $self->_request( '/unread' => { subscribe_id => $subscribe_id } )
+    );
+}
+
+sub get_all_of {
+    my ($self, $arg1, $offset, $limit) = @_;
+
+    my $subscribe_id = $self->_subscribe_id($arg1);
+    my $param = {
+        subscribe_id => $subscribe_id,
+        $offset? ( offset => $offset ) : (),
+        $limit?  ( limit  => $limit  ) : (),
+    };
+
+    WebService::LDR::Response::Article->new(
+        $self->_request( '/all' => $param )
     );
 }
 

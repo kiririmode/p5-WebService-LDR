@@ -34,7 +34,7 @@ SKIP: {
         isa_ok( $feed, 'WebService::LDR::Response::Feed' );
         my $unread = $ldr->get_unread_of( $feed );
 
-        isa_ok( $unread, 'WebService::LDR::Response::Unread' );
+        isa_ok( $unread, 'WebService::LDR::Response::Article' );
         can_ok( $unread, qw/subscribe_id last_stored_on channel items/ );
         ok( looks_like_number( $unread->subscribe_id ), 'subscribe_id is a number' );
         isa_ok( $unread->channel, 'WebService::LDR::Response::Channel' );

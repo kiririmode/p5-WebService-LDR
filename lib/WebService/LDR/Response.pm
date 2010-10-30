@@ -67,7 +67,7 @@ sub accessors {
 __PACKAGE__->mk_accessors( accessors() );
 
 # ================================================================================
-package WebService::LDR::Response::Unread;
+package WebService::LDR::Response::Article;
 use base qw/WebService::LDR::Response/;
 
 # last_stored_on isn't necessary parameter.

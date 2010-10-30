@@ -173,6 +173,21 @@ sub read {
     );
 }
 
+sub set_rate {
+    my ($self, $arg, $rate) = @_;
+
+    Carp::croak "rate is undef"        unless defined $rate;
+    Carp::croak "rate is not a number" unless looks_like_number($rate);
+
+    my $subscribe_id = $self->_subscribe_id($arg);
+    WebService::LDR::Response::Result->new(
+        $self->_request('/feed/set_rate' => {
+            subscribe_id => $subscribe_id,
+            rate         => $rate
+        })
+    );
+}
+
 sub _subscribe_id {
     my ($self, $arg) = @_;
     $self->_extract($arg, "subscribe_id");

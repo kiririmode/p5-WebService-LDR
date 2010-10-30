@@ -11,7 +11,7 @@ BEGIN {
 }
 
 SKIP: {
-    skip "LDR_TEST_ID and/or LDR_TEST_PASS is not set", 13
+    skip "LDR_TEST_ID and/or LDR_TEST_PASS is not set", 6
         unless ($ENV{LDR_TEST_ID} and $ENV{LDR_TEST_PASS});
 
     my $rss = 'http://d.hatena.ne.jp/kiririmode/rss';

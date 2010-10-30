@@ -13,8 +13,8 @@ my $cnt = 1;
 
 SKIP: {
     unless ($ENV{LDR_TEST_ID} and $ENV{LDR_TEST_PASS}) {
-        $cnt += 28;
-        skip "LDR_TEST_ID and/or LDR_TEST_PASS is not set", 28;
+        $cnt += 27;
+        skip "LDR_TEST_ID and/or LDR_TEST_PASS is not set", 27;
     }
 
     my $ldr = WebService::LDR->new( 
@@ -59,10 +59,9 @@ SKIP: {
             ok( $item->body, 'body is not null' );
             isa_ok( $item->created_on, 'DateTime' );
             isa_ok( $item->modified_on, 'DateTime' );
-            ok( $item->category, 'category is not null' );
             ok( $item->title, 'title is not null' );
             ok( looks_like_number( $item->id ), 'id is a number' );
-            $cnt += 11;
+            $cnt += 10;
         }
 
     }

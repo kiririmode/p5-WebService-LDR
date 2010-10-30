@@ -86,10 +86,12 @@ sub auto_discovery {
 }
 
 sub subscribe {
-    my ($self, $link) = @_;
+    my ($self, $arg) = @_;
 
-    my @discovered = $self->auto_discovery($link) or do {
-        $DEBUG && debug("cannot discover feed on $link");
+    my $feedlink = $self->_feedlink($arg);
+
+    my @discovered = $self->auto_discovery($feedlink) or do {
+        $DEBUG && debug("cannot discover feed on $feedlink");
         return;
     };
 
@@ -158,18 +160,28 @@ sub get_all_of {
 
 sub _subscribe_id {
     my ($self, $arg) = @_;
+    $self->_extract($arg, "subscribe_id");
+}
+
+sub _feedlink {
+    my ($self, $arg) = @_;
+    $self->_extract($arg, "feedlink");
+}
+
+sub _extract {
+    my ($self, $arg, $prop) = @_;
 
     unless( defined $arg ) {
         Carp::croak "argument isn't defined";
     }
 
     if ( ref $arg ) {
-        if ( $arg->can('subscribe_id') ) { 
-            return defined $arg->subscribe_id
-                ? $arg->subscribe_id
-                : Carp::croak( "subscribe_id isn't defined" );
+        if ( $arg->can($prop) ) {
+            return defined $arg->$prop()
+                ? $arg->$prop()
+                : Carp::croak( "$prop isn't defined" );
         }
-        else { Carp::croak "argument cannot call subscribe_id! "; }
+        else { Carp::croak "argument cannot call $prop !"; }
     }
     $arg;
 }

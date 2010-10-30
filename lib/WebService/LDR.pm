@@ -88,10 +88,16 @@ sub auto_discovery {
 sub subscribe {
     my ($self, $arg) = @_;
 
-    my $feedlink = $self->_feedlink($arg);
+    my $link;
+    if ( ref($arg) || ! $arg->isa('URI') ) {
+        $link = $self->_feedlink($arg);
+    }
+    else {
+        $link = $arg;
+    }
 
-    my @discovered = $self->auto_discovery($feedlink) or do {
-        $DEBUG && debug("cannot discover feed on $feedlink");
+    my @discovered = $self->auto_discovery($link) or do {
+        $DEBUG && debug("cannot discover feed on $link");
         return;
     };
 

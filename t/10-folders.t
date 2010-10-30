@@ -25,7 +25,7 @@ SKIP: {
 
     my $folders = $ldr->folders;
     isa_ok($folders, 'WebService::LDR::Response::Folders');
-    can_ok($folders, qw/name2id names/);
+    can_ok($folders, qw/name2id names exists/);
     isa_ok($folders->name2id, 'HASH');
     isa_ok($folders->names,   'ARRAY');
 }

@@ -93,4 +93,13 @@ sub accessors {
 }
 __PACKAGE__->mk_accessors( accessors() );
 
+# ================================================================================
+package WebService::LDR::Response::Folders;
+use base qw/WebService::LDR::Response/;
+
+sub accessors {
+    qw/name2id names/
+}
+__PACKAGE__->mk_accessors( accessors() );
+
 1;

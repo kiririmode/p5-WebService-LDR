@@ -188,6 +188,14 @@ sub set_rate {
     );
 }
 
+sub folders {
+    my ($self) = @_;
+
+    WebService::LDR::Response::Folders->new(
+        $self->_request('/folders')
+    );
+}
+
 sub _subscribe_id {
     my ($self, $arg) = @_;
     $self->_extract($arg, "subscribe_id");

@@ -43,7 +43,7 @@ sub accessors {
 __PACKAGE__->mk_accessors( accessors() );
 
 # ================================================================================
-package WebService::LDR::Response::Subscribe;
+package WebService::LDR::Response::Result;
 use base qw/WebService::LDR::Response/;
 sub accessors {
     qw/subscribe_id ErrorCode isSuccess/

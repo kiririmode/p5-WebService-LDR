@@ -28,7 +28,7 @@ SKIP: {
     $ldr->unsubscribe( $links[0]->link );
 
     my $ret = $ldr->subscribe($rss);
-    isa_ok( $ret, 'WebService::LDR::Response::Subscribe' );
+    isa_ok( $ret, 'WebService::LDR::Response::Result' );
     can_ok( $ret, qw/subscribe_id ErrorCode isSuccess/ );
     ok( $ret->isSuccess, 'subscribe success' );
     ok( looks_like_number( $ret->subscribe_id ), 'subscribe_id is a number' );

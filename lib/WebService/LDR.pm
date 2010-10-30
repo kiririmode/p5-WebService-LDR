@@ -95,7 +95,7 @@ sub subscribe {
         return;
     };
 
-    WebService::LDR::Response::Subscribe->new( 
+    WebService::LDR::Response::Result->new( 
         $self->_request( '/feed/subscribe' => { feedlink => $discovered[0]->feedlink->as_string } )
     );
 }

@@ -232,6 +232,19 @@ sub delete_folder {
     );
 }
 
+sub move_folder {
+    my ($self, $feed, $dirname) = @_;
+
+    my $subscribe_id = $self->_subscribe_id($feed);
+
+    WebService::LDR::Response::Result->new(
+        $self->_request('/feed/move' => {
+            subscribe_id => $subscribe_id,
+            to           => $dirname
+        })
+    );
+}
+
 sub _subscribe_id {
     my ($self, $arg) = @_;
     $self->_extract($arg, "subscribe_id");

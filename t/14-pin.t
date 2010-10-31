@@ -12,8 +12,10 @@ BEGIN {
 
 my $cnt = 1;
 SKIP: {
-    skip "LDR_TEST_ID and/or LDR_TEST_PASS is not set", 10
-        unless ($ENV{LDR_TEST_ID} and $ENV{LDR_TEST_PASS});
+    unless ($ENV{LDR_TEST_ID} and $ENV{LDR_TEST_PASS}) {
+        $cnt = 14;
+        skip "LDR_TEST_ID and/or LDR_TEST_PASS is not set", 13;
+    }
 
     my $ldr = WebService::LDR->new( 
         user => $ENV{LDR_TEST_ID}, 

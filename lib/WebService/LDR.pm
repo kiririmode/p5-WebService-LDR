@@ -202,9 +202,7 @@ sub make_folder {
 
     Carp::croak "name isn't specified" unless $name;
     
-    unless ($self->apiKey) {
-        $self->auto_discovery('http://www.google.co.jp');
-    }
+    $self->_require_apiKey;
     WebService::LDR::Response::Result->new(
         $self->_request('/folder/create' => {
             name => $name
@@ -256,15 +254,21 @@ sub get_pin_all {
 sub add_pin {
     my ($self, $link, $title) = @_;
 
-    unless ($self->apiKey) {
-        $self->auto_discovery('http://www.google.co.jp');
-    }
+    $self->_require_apiKey;
     WebService::LDR::Response::Result->new(
         $self->_request('/pin/add' => {
             link  => "$link",
             title => $title,
         })
     );
+}
+
+sub _require_apiKey {
+    my ($self) = @_;
+
+    unless ($self->apiKey) {
+        $self->auto_discovery('http://www.google.co.jp');
+    }
 }
 
 sub _subscribe_id {

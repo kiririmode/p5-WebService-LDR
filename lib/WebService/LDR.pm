@@ -276,6 +276,15 @@ sub delete_pin {
     );
 }
 
+sub clear_pin {
+    my ($self) = @_;
+
+    $self->_require_apiKey;
+    WebService::LDR::Response::Result->new(
+        $self->_request('/pin/clear')
+    );
+}
+
 sub _require_apiKey {
     my ($self) = @_;
 

@@ -13,8 +13,8 @@ BEGIN {
 my $cnt = 1;
 SKIP: {
     unless ($ENV{LDR_TEST_ID} and $ENV{LDR_TEST_PASS}) {
-        $cnt = 14;
-        skip "LDR_TEST_ID and/or LDR_TEST_PASS is not set", 13;
+        $cnt = 16;
+        skip "LDR_TEST_ID and/or LDR_TEST_PASS is not set", 15;
     }
 
     my $ldr = WebService::LDR->new( 
@@ -48,6 +48,16 @@ SKIP: {
 
     my @pins2 = $ldr->get_pin_all();
     cmp_ok( $pin_number - 1, '==', scalar(@pins2), 'pin number after deletion' ); $cnt++;
+
+    my $res3 = $ldr->clear_pin();
+    isa_ok( $res3, 'WebService::LDR::Response::Result' ); $cnt++;
+
+    my @pins3 = $ldr->get_pin_all();
+    cmp_ok(scalar(@pins3), '==', 0, 'pin number after clear'); $cnt++;
+
+    for my $pin (@pins2) {
+        $ldr->add_pin( $pin->link, $pin->title );
+    }
 }
 
 done_testing($cnt);

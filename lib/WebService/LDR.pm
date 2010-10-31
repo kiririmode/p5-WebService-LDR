@@ -246,6 +246,13 @@ sub move_folder {
     );
 }
 
+sub get_pin_all {
+    my ($self) = @_;
+
+    map { WebService::LDR::Response::Pin->new($_) }
+        @{ $self->_request('/pin/all') };
+}
+
 sub _subscribe_id {
     my ($self, $arg) = @_;
     $self->_extract($arg, "subscribe_id");

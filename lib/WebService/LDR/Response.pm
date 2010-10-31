@@ -107,4 +107,13 @@ sub exists {
     exists $self->name2id->{$name};
 }
 
+# ================================================================================
+package WebService::LDR::Response::Pin;
+use base qw/WebService::LDR::Response/;
+
+sub accessors {
+    qw/link created_on title/
+}
+__PACKAGE__->mk_accessors( accessors() );
+
 1;

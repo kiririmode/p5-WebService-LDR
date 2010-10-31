@@ -14,18 +14,80 @@ use Try::Tiny;
 
 __PACKAGE__->mk_accessors( qw/apiKey/ );
 
+=head1 NAME
+
+WebService::LDR - The thin Perl interface to L<Livedoor Reader|http://reader.livedoor.com>
+
+=head1 VERSION
+
+Version 0.01
+
+=cut
+
+our $VERSION = '0.01';
+
+=head1 SYNOPSIS
+
+    use WebService::LDR;
+
+    my $ldr = WebService::LDR->new(
+        user => 'your livedoor_id',
+        pass => 'your password',
+    )->login;
+
+    for my $uri (@uris) {
+        my $res = $ldr->subscribe($uri) or do {
+            warn "cannot discover feed at $uri"; next;
+        };
+        $res->isSuccess
+            ? print "success\n";
+            : print "failed\n";
+    }
+
+=head1 DESCRIPTION
+
+WebService::LDR is a very thin interface to L<Livedoor reader|http://reader.livedoor.com>,
+which is well-known online RSS reader in Japan.  With this module, you can (un)?subscribe
+feeds, retrieve entry information which you haven't read, add and clear pins, etc. from
+your script.
+
+=cut
+
 my $DEBUG;
 
 my $urls = {
-    login   => 'https://member.livedoor.com/login/',
-    base    => 'http://reader.livedoor.com/api',
-    notify  => 'http://rpc.reader.livedoor.com/notify',
+    login   => 'https://member.livedoor.com/login/',    # url for login
+    base    => 'http://reader.livedoor.com/api',        # url of API base
+    notify  => 'http://rpc.reader.livedoor.com/notify', # url for unread pin number
 };
+
+=head1 METHODS
+
+=head2 new
+
+    my $ldr = WebService::LDR->new(
+        user  => 'your livedoor_id',
+        pass  => 'your password',
+        debug => 1,
+    );
+
+Creates and returns a new C<WebService::LDR> object.  C<new> takes two mandatory 
+parameters, C<user> and C<pass>, and two optional parameters C<debug> and 
+C<mech> as written above.
+
+C<user> is your livedoor_id and C<pass> is its password.
+With C<debug> being true value, C<WebService::LDR> prints its request and
+response to I<STDOUT> for debug purpose.
+
+C<mech> must be an hashref, and is passed directory to L<WWW::Mechanize>
+constructor C<new>.
+
+=cut
 
 sub new {
     my ($class, %args) = @_;
 
-    _init( %args );
+    _validate( %args );
     my $mech_conf = delete $args{mech} || [];
 
     my $self = bless {
@@ -42,7 +104,7 @@ sub new {
     $self;
 }
 
-sub _init {
+sub _validate {
     my (%args) = @_;
 
     my $user = $args{user};
@@ -53,6 +115,23 @@ sub _init {
 
     $DEBUG = $args{debug};
 }
+
+=head2 login
+
+    $ldr->login;
+
+Logins to Livedoor Reader with livedoor_id and password
+passed to constructor.  As this method returns C<WebService::LDR> object,
+it can be used with methodchain.
+
+    my $ldr = WebService::LDR->new(
+        user => 'hoge',
+        pass => 'fuga',
+    )->login;
+
+It croaks when login failed.
+
+=cut
 
 sub login {
     my ($self) = @_;
@@ -79,12 +158,74 @@ sub login {
     $self;
 }
 
+=head2 auto_discovery
+
+    my @discoveries = $ldr->auto_discovery( "http://d.hatena.ne.jp/kiririmode" );
+
+Discovers RSS URLs on URL passed as an parameter.  Parameter can be everything
+which is evaluated as string, such as L<URI> class.
+
+It returns list of C<WebService::LDR::Response::Discovery>s.
+
+=head3 WebService::LDR::Response::Discovery
+
+WebService::LDR::Response::Discovery is just a thin wrapper, and has only
+getters and setters (latter may not be used).
+
+It has following getters.  Most of their return value can be easily guessed with
+its method name.
+
+=over 4
+
+=item * link
+
+=item * subscribe_id
+
+=item * title
+
+=item * feedlink
+
+=item * subscribers_count
+
+=back
+
+=cut
+
 sub auto_discovery {
     my ($self, $url) = @_;
 
     my $json = $self->_request( '/feed/discover' => { url => "$url" } );
     map { WebService::LDR::Response::Discovery->new( $_ ) } @$json;
 }
+
+=head2 subscribe
+
+    my $result = $ldr->subscribe($uri) or 
+        warn "cannot discover feed on $uri";
+
+Subscribes feed on specified URI.  It returns WebService::LDR::Response::Result
+on success, and undef on failure of discovering feed on the URI.
+
+Argument can be string URI, C<URI> class, or everything having C<feedlink> method
+which returns RSS URI.  If a string or C<URI> is passed as a parameter, it executes
+C<auto_discovery> to discover its feed, and then subscribes the feed.
+
+=head3 WebService::LDR::Response::Result
+
+WebService::LDR::Response::Result is also a wrapper of response from Livedoor
+Reader, and has the followings.
+
+=over 4
+
+=item * subscribe_id
+
+=item * ErrorCode
+
+=item * isSuccess
+
+=back
+
+=cut
 
 sub subscribe {
     my ($self, $arg) = @_;
@@ -391,50 +532,6 @@ sub debug {
     print "[DEBUG] ", @_, "\n" if @_;
 }
 
-
-
-=head1 NAME
-
-WebService::LDR - The great new WebService::LDR!
-
-=head1 VERSION
-
-Version 0.01
-
-=cut
-
-our $VERSION = '0.01';
-
-
-=head1 SYNOPSIS
-
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
-
-    use WebService::LDR;
-
-    my $foo = WebService::LDR->new();
-    ...
-
-=head1 EXPORT
-
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
-
-=head1 SUBROUTINES/METHODS
-
-=head2 function1
-
-=cut
-
-=head2 function2
-
-=cut
-
-sub function2 {
-}
-
 =head1 AUTHOR
 
 kiririmode, C<< <kiririmode at gmail.com> >>
@@ -444,9 +541,6 @@ kiririmode, C<< <kiririmode at gmail.com> >>
 Please report any bugs or feature requests to C<bug-webservice-ldr at rt.cpan.org>, or through
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WebService-LDR>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
-
-
-
 
 =head1 SUPPORT
 

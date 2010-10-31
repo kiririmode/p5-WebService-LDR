@@ -29,8 +29,10 @@ SKIP: {
     my $res1 = $ldr->add_pin( $uri => $title );
     isa_ok( $res1, 'WebService::LDR::Response::Result' ); $cnt++;
 
-    my @pins = $ldr->get_pin_all();
-    my $pin = shift @pins;
+    my @pins1 = $ldr->get_pin_all();
+    my $pin_number = @pins1;
+
+    my $pin = shift @pins1;
     isa_ok( $pin, 'WebService::LDR::Response::Pin' ); $cnt++;
     can_ok( $pin, qw/link created_on title/ );        $cnt++;
     isa_ok( $pin->link, 'URI' );                      $cnt++;
@@ -38,6 +40,12 @@ SKIP: {
 
     cmp_ok( $pin->link->as_string, 'eq', $uri, 'same URI' ); $cnt++;
     cmp_ok( $pin->title, 'eq', $title, 'same title' );       $cnt++;
+
+    my $res2 = $ldr->delete_pin($uri);
+    isa_ok( $res1, 'WebService::LDR::Response::Result' ); $cnt++;
+
+    my @pins2 = $ldr->get_pin_all();
+    cmp_ok( $pin_number - 1, '==', scalar(@pins2), 'pin number after deletion' ); $cnt++;
 }
 
 done_testing($cnt);

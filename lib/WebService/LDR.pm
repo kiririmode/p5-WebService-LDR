@@ -302,7 +302,8 @@ sub unread_cnt {
         user => $self->{user}
     });
     my $content = $res->content;
-    my ($cnt) = $content =~ /\|(\d+)\|\|/;
+    $DEBUG && debug("content=[$content]");
+    my ($cnt) = $content =~ /\|(-?\d+)\|\|/;
     $cnt;
 }
 

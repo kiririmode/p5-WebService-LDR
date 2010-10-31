@@ -253,6 +253,20 @@ sub get_pin_all {
         @{ $self->_request('/pin/all') };
 }
 
+sub add_pin {
+    my ($self, $link, $title) = @_;
+
+    unless ($self->apiKey) {
+        $self->auto_discovery('http://www.google.co.jp');
+    }
+    WebService::LDR::Response::Result->new(
+        $self->_request('/pin/add' => {
+            link  => "$link",
+            title => $title,
+        })
+    );
+}
+
 sub _subscribe_id {
     my ($self, $arg) = @_;
     $self->_extract($arg, "subscribe_id");

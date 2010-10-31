@@ -102,4 +102,9 @@ sub accessors {
 }
 __PACKAGE__->mk_accessors( accessors() );
 
+sub exists {
+    my ($self, $name) = @_;
+    exists $self->name2id->{$name};
+}
+
 1;

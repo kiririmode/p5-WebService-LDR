@@ -196,6 +196,42 @@ sub folders {
     );
 }
 
+sub make_folder {
+    my ($self, $name) = @_;
+
+    Carp::croak "name isn't specified" unless $name;
+    
+    unless ($self->apiKey) {
+        $self->auto_discovery('http://www.google.co.jp');
+    }
+    WebService::LDR::Response::Result->new(
+        $self->_request('/folder/create' => {
+            name => $name
+        })
+    );
+}
+
+sub delete_folder {
+    my ($self, $name) = @_;
+
+    my $folders = $self->folders();
+
+    my $id;
+    if ( $folders->exists($name) ) {
+        $id = $folders->name2id->{$name};
+    } elsif ( looks_like_number($name)  ) {
+        $id = $name;
+    } else {
+        Carp::croak "$name is not a directory name, or hasn't created yet";
+    }
+
+    WebService::LDR::Response::Result->new(
+        $self->_request('/folder/delete' => {
+            folder_id => $id
+        })
+    );
+}
+
 sub _subscribe_id {
     my ($self, $arg) = @_;
     $self->_extract($arg, "subscribe_id");
@@ -223,7 +259,6 @@ sub _extract {
     }
     $arg;
 }
-
 
 sub _request {
     my ($self, $api, $opt) = @_;

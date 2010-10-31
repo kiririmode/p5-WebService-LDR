@@ -35,8 +35,6 @@ SKIP: {
     isa_ok($folders->name2id, 'HASH');
     isa_ok($folders->names,   'ARRAY');
     ok( $folders->exists("test$i"), 'create test directory' );
-    sleep 3;
-
     my $res = $ldr->delete_folder("test$i");
     isa_ok( $res, 'WebService::LDR::Response::Result' );
     $folders = $ldr->folders;

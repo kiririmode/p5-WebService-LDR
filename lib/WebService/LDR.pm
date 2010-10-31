@@ -263,6 +263,19 @@ sub add_pin {
     );
 }
 
+sub delete_pin {
+    my ($self, $arg) = @_;
+
+    my $link = $self->_link($arg);
+
+    $self->_require_apiKey;
+    WebService::LDR::Response::Result->new(
+        $self->_request('/pin/remove' => {
+            link => "$link",
+        })
+    );
+}
+
 sub _require_apiKey {
     my ($self) = @_;
 
@@ -279,6 +292,11 @@ sub _subscribe_id {
 sub _feedlink {
     my ($self, $arg) = @_;
     $self->_extract($arg, "feedlink");
+}
+
+sub _link {
+    my ($self, $arg) = @_;
+    $self->_extract($arg, "link");
 }
 
 sub _extract {

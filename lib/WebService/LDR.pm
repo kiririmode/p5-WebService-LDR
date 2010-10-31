@@ -19,6 +19,7 @@ my $DEBUG;
 my $urls = {
     login   => 'https://member.livedoor.com/login/',
     base    => 'http://reader.livedoor.com/api',
+    notify  => 'http://rpc.reader.livedoor.com/notify',
 };
 
 sub new {
@@ -279,15 +280,10 @@ sub _request {
     my $url = $urls->{base} . $api;
     $DEBUG && debug("POSTing $url with ", Data::Dumper::Dumper($opt));
 
-    my $res;
-    try {
-        $res = $self->{mech}->post( $url => {
-            $opt? %$opt : (),
-            ApiKey => $self->apiKey,
-        });
-    } finally {
-        $DEBUG && debug("POST response status=[", $self->{mech}->status, "]");
-    };
+    my $res = $self->_post( $url => {
+        $opt? %$opt : (),
+        ApiKey => $self->apiKey,
+    });
 
     $self->_parse_cookie_apikey() unless $self->apiKey;
     if ( ! $res || ! $res->is_success ) {
@@ -297,6 +293,31 @@ sub _request {
     my $json = from_json( $self->{mech}->content, { utf8 => 0 } );
     $DEBUG && debug("$api returns ", Data::Dumper::Dumper($json));
     $json;
+}
+
+sub unread_cnt {
+    my ($self) = @_;
+
+    my $res = $self->_post( $urls->{notify} => {
+        user => $self->{user}
+    });
+    my $content = $res->content;
+    my ($cnt) = $content =~ /\|(\d+)\|\|/;
+    $cnt;
+}
+
+sub _post {
+    my ($self, $uri, $opt) = @_;
+
+    my $res;
+    try {
+        $res = $self->{mech}->post( $uri => {
+            $opt? %$opt : ()
+        });
+    } finally {
+        $DEBUG && debug("POST response status=[", $self->{mech}->status, "]");
+    };
+    $res;
 }
 
 sub _parse_cookie_apikey {

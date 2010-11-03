@@ -9,6 +9,9 @@ requires 'WWW::Mechanize' => 0;
 requires 'JSON' => 0;
 requires 'Scalar::Util' => 0;
 requires 'Try::Tiny' => 0;
+requires 'Class::Accessor::Fast' => 0;
+requires 'DateTime' => 0;
+requires 'Crypt::SSLeay' => 0;
 
 test_requires 'Test::Exception' => 0;
 

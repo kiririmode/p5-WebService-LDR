@@ -422,6 +422,15 @@ sub read {
     );
 }
 
+=head2 set_rate
+
+  my $result = $ldr->set_rate($feed => $rate)
+
+Set the rate of specified C<$feed> to C<$rate> (between 1 and 5).  
+C<$feed> can be everything which has C<subscribe_id> method.  
+
+=cut
+
 sub set_rate {
     my ($self, $arg, $rate) = @_;
 
@@ -437,6 +446,29 @@ sub set_rate {
     );
 }
 
+=head2 folders
+
+    my $folder_info = $ldr->folders();
+
+Retrieves folder information on your Livedoor Reader account.  It returns
+C<WebService::LDR::Response::Folder> class, which has following methods.
+
+=over 4
+
+=item * name2id
+
+Gets the hash reference which has mapping of folder name and its ID.
+
+=item * names
+
+Gets the array reference, which contents are the folder names.
+
+=item * exists
+
+Return true value if the folder name passed exists.
+
+=cut
+
 sub folders {
     my ($self) = @_;
 
@@ -444,6 +476,14 @@ sub folders {
         $self->_request('/folders')
     );
 }
+
+=head2 make_folder
+
+    $ldr->make_folder($folder_name);
+
+Creates folder on Livedoor Reader.  It returns C<WebService::LDR::Response::Result>.  
+
+=cut
 
 sub make_folder {
     my ($self, $name) = @_;
@@ -457,6 +497,15 @@ sub make_folder {
         })
     );
 }
+
+=head2 delete_folder
+
+    $ldr->delete_folder($name_or_id);
+
+Deletes folder on Livedoor Reader.  The argument is folder name or its ID to be deleted.
+This method also returns C<WebService::LDR::Response::Result>.
+
+=cut
 
 sub delete_folder {
     my ($self, $name) = @_;
@@ -479,6 +528,15 @@ sub delete_folder {
     );
 }
 
+=head2 move_folder
+
+    $ldr->move_folder($feed => $folder);
+
+Moves C<$feed> to folder C<$folder>.
+This method also returns C<WebService::LDR::Response::Result>.
+
+=cut
+
 sub move_folder {
     my ($self, $feed, $dirname) = @_;
 
@@ -492,12 +550,39 @@ sub move_folder {
     );
 }
 
+=head2 get_pin_all
+
+    my @pins = $ldr->get_pin_all();
+
+Retrieves all entries you have pinned on Livedoor Reader.  The entries are returned as
+an array of C<WebService::LDR::Response::Pin>, which has following properties.
+
+=over 4
+
+=item * link
+
+=item * created_on
+
+=item * title
+
+=cut
+
 sub get_pin_all {
     my ($self) = @_;
 
     map { WebService::LDR::Response::Pin->new($_) }
         @{ $self->_request('/pin/all') };
 }
+
+=head2 add_pin
+
+    my $result = $ldr->add_pin($link, $title);
+
+Pins specified C<$link> on Livedoor Reader as C<$title>.  C<$link> can be everything
+its stringfied values are URI, such as L<URI> class.
+This method returns C<WebService::LDR::Response::Result>.
+
+=cut
 
 sub add_pin {
     my ($self, $link, $title) = @_;
@@ -511,6 +596,15 @@ sub add_pin {
     );
 }
 
+=head2 delete_pin
+
+    my $result = $ldr->delete_pin($link);
+
+Deletes entry of specified C<$link> on Your Livedoor Reader, and returns
+C<WebService::LDR::Response::Result>.
+
+=cut
+
 sub delete_pin {
     my ($self, $arg) = @_;
 
@@ -523,6 +617,14 @@ sub delete_pin {
         })
     );
 }
+
+=head2 clear_pin
+
+    my $result = $ldr->clear_pin();
+
+Deletes all entries you have pinned, and returns C<WebService::LDR::Response::Result>
+
+=cut
 
 sub clear_pin {
     my ($self) = @_;
@@ -645,42 +747,13 @@ kiririmode, C<< <kiririmode at gmail.com> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-webservice-ldr at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WebService-LDR>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests to me via above gmail account or L<github|https://github.com/kiririmode/WebService-LDR>.
 
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
     perldoc WebService::LDR
-
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=WebService-LDR>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/WebService-LDR>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/WebService-LDR>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/WebService-LDR/>
-
-=back
-
-
-=head1 ACKNOWLEDGEMENTS
-
 
 =head1 LICENSE AND COPYRIGHT
 

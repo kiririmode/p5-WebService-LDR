@@ -213,7 +213,7 @@ C<auto_discovery> to discover its feed, and then subscribes the feed.
 =head3 WebService::LDR::Response::Result
 
 WebService::LDR::Response::Result is also a wrapper of response from Livedoor
-Reader, and has the followings.
+Reader, and has the following properties.
 
 =over 4
 
@@ -231,7 +231,7 @@ sub subscribe {
     my ($self, $arg) = @_;
 
     my $link;
-    if ( ref($arg) || ! $arg->isa('URI') ) {
+    if ( ref($arg) && ! $arg->isa('URI') ) {
         $link = $self->_feedlink($arg);
     }
     else {
@@ -248,6 +248,19 @@ sub subscribe {
     );
 }
 
+=head2 unsubscribe
+
+    my $result = $ldr->unsubscribe($uri) or 
+        warn "cannot discover feed on $uri";
+
+Unsubscribes feed on specified URI.  It returns WebService::LDR::Response::Result
+on success, and undef on failure of discovering feed on the URI.
+
+Argument can be string URI or subscribe_id.
+If a string or C<URI> is passed as a parameter, it executes
+C<auto_discovery> to discover its feed, and then unsubscribes the feed.
+
+=cut
 sub unsubscribe {
     my ($self, $arg ) = @_;
 
@@ -268,6 +281,37 @@ sub unsubscribe {
     );
 }
 
+=head2 get_feed_all
+
+    my @feeds = $ldr->get_feed_all();
+
+Retrieves all feeds you have subscribed.  Each feed is C<WebService::LDR::Response::Feed> class
+and has the following properties.
+
+=head3 WebService::LDR::Response::Feed
+
+=over 4
+
+=item * icon 
+
+=item * link 
+
+=item * subscribe_id 
+
+=item * unread_count 
+
+=item * tags 
+
+=item * folder 
+
+=item * rate 
+
+=item * modified_on 
+
+=back
+
+=cut 
+
 sub get_feed_all {
     my ($self) = @_;
 
@@ -275,12 +319,50 @@ sub get_feed_all {
         @{ $self->_request( '/subs' => { unread => 0 } ) };
 }
 
+=head2 get_feed_all
+
+    my @feeds = $ldr->get_feed_unread();
+
+Retrieves unread feeds you have subscribed.  Each feed is C<WebService::LDR::Response::Feed> class.
+
+=cut
+
 sub get_feed_unread {
     my ($self) = @_;
 
     map { WebService::LDR::Response::Feed->new($_) } 
         @{ $self->_request( '/subs' => { unread => 1 } ) };
 }
+
+=head2 get_unread_of
+
+    my $article = $ldr->get_unread_of($arg);
+
+Retrieves unread article on a specified feed.  The argument can be
+everything which has subscribe_id property such as C<WebService::LDR::Response::Feed>,
+or just a subscribe_id.
+
+This method returns C<WebService::LDR::Response::Article>, which has the followings.
+
+=head3 C<WebService::LDR::Response::Article>
+
+=over 4
+
+=item * subscribe_id 
+
+=item * last_stored_on 
+
+=item * channel
+
+C<WebService::LDR::Response::Channel> class.  It has C<link>, C<icon>, C<description>,
+C<image>, C<title>, C<feedlink>, C<subscribers_count>, and C<expires>.
+
+=item * items
+
+Array reference of C<WebService::LDR::Response::Item> class.  It has C<link>, C<enclosure>, C<enclosure_type>,
+C<author>, C<body>, C<created_on>, C<modified_on>, C<category>, C<title>, and C<id>.
+
+=cut
 
 sub get_unread_of {
     my ($self, $arg) = @_;
@@ -290,6 +372,22 @@ sub get_unread_of {
         $self->_request( '/unread' => { subscribe_id => $subscribe_id } )
     );
 }
+
+=head2 get_all_of
+
+    my $article = $ldr->get_all_of($feed, $offset, $limit);
+
+Retrieves all articles on a specified feed.  The C<$feed> can be everything
+which has subscribe_id property such as C<WebService::LDR::Response::Article>,
+or just a subscribe_id.
+
+C<$offset> and C<$limit> are optional arguments.  C<$offset> is the starting
+point of item which is returned from this method.  C<$limit> is the number of
+items returned.
+
+An article returned is the class C<WebService::LDR::Response::Article>.
+
+=cut
 
 sub get_all_of {
     my ($self, $arg1, $offset, $limit) = @_;
@@ -305,6 +403,15 @@ sub get_all_of {
         $self->_request( '/all' => $param )
     );
 }
+
+=head2 read
+
+  my $result = $ldr->read($feed);
+
+Makes all items on the C<$feed> read and returns C<WebService::LDR::Response::Result>.
+C<$feed> can be everything which has subscribe_id method.
+
+=cut
 
 sub read {
     my ($self, $arg) = @_;

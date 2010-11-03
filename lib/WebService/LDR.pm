@@ -319,7 +319,7 @@ sub get_feed_all {
         @{ $self->_request( '/subs' => { unread => 0 } ) };
 }
 
-=head2 get_feed_all
+=head2 get_feed_unread
 
     my @feeds = $ldr->get_feed_unread();
 
@@ -696,6 +696,12 @@ sub _request {
     $DEBUG && debug("$api returns ", Data::Dumper::Dumper($json));
     $json;
 }
+
+=head2 unread_cnt
+
+Returns number of unread entries.
+
+=cut
 
 sub unread_cnt {
     my ($self) = @_;

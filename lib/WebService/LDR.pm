@@ -362,6 +362,8 @@ C<image>, C<title>, C<feedlink>, C<subscribers_count>, and C<expires>.
 Array reference of C<WebService::LDR::Response::Item> class.  It has C<link>, C<enclosure>, C<enclosure_type>,
 C<author>, C<body>, C<created_on>, C<modified_on>, C<category>, C<title>, and C<id>.
 
+=back
+
 =cut
 
 sub get_unread_of {
@@ -467,6 +469,8 @@ Gets the array reference, which contents are the folder names.
 
 Return true value if the folder name passed exists.
 
+=back
+
 =cut
 
 sub folders {
@@ -564,6 +568,8 @@ an array of C<WebService::LDR::Response::Pin>, which has following properties.
 =item * created_on
 
 =item * title
+
+=back
 
 =cut
 

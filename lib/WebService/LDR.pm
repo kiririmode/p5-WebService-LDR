@@ -731,6 +731,12 @@ sub _post {
         });
     } finally {
         $DEBUG && debug("POST response status=[", $self->{mech}->status, "]");
+        if ( ! $res ) {
+            Carp::croak "POST failed. status=[", $self->{mech}->status, "] res is undefined";
+        }
+        if ( ! $res->is_success ) {
+            Carp::croak "POST failed. status=[", $self->{mech}->status, "] status line=[", $res->status_line, "]";
+        }
     };
     $res;
 }

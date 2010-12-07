@@ -71,8 +71,8 @@ my $urls = {
         debug => 1,
     );
 
-Creates and returns a new C<WebService::LDR> object.  C<new> takes two mandatory 
-parameters, C<user> and C<pass>, and two optional parameters C<debug> and 
+Creates and returns a new C<WebService::LDR> object.  C<new> takes two mandatory
+parameters, C<user> and C<pass>, and two optional parameters C<debug> and
 C<mech> as written above.
 
 C<user> is your livedoor_id and C<pass> is its password.
@@ -140,7 +140,7 @@ sub login {
     if ( $self->{mech}->content =~ /name="loginForm"/ ) {
 
         $DEBUG && debug( "submit form to login as an user=[", $self->{user}, "]" );
-        $self->{mech}->submit_form( 
+        $self->{mech}->submit_form(
             form_name => 'loginForm',
             fields => {
                 livedoor_id => $self->{user},
@@ -200,7 +200,7 @@ sub auto_discovery {
 
 =head2 subscribe
 
-    my $result = $ldr->subscribe($uri) or 
+    my $result = $ldr->subscribe($uri) or
         warn "cannot discover feed on $uri";
 
 Subscribes feed on specified URI.  It returns WebService::LDR::Response::Result
@@ -243,14 +243,14 @@ sub subscribe {
         return;
     };
 
-    WebService::LDR::Response::Result->new( 
+    WebService::LDR::Response::Result->new(
         $self->_request( '/feed/subscribe' => { feedlink => $discovered[0]->feedlink->as_string } )
     );
 }
 
 =head2 unsubscribe
 
-    my $result = $ldr->unsubscribe($uri) or 
+    my $result = $ldr->unsubscribe($uri) or
         warn "cannot discover feed on $uri";
 
 Unsubscribes feed on specified URI.  It returns WebService::LDR::Response::Result
@@ -276,7 +276,7 @@ sub unsubscribe {
         $subscribe_id = $discovered[0]->subscribe_id;
     }
 
-    WebService::LDR::Response::Unsubscribe->new( 
+    WebService::LDR::Response::Unsubscribe->new(
         $self->_request( '/feed/unsubscribe' => { subscribe_id => $subscribe_id } )
     );
 }
@@ -292,30 +292,30 @@ and has the following properties.
 
 =over 4
 
-=item * icon 
+=item * icon
 
-=item * link 
+=item * link
 
-=item * subscribe_id 
+=item * subscribe_id
 
-=item * unread_count 
+=item * unread_count
 
-=item * tags 
+=item * tags
 
-=item * folder 
+=item * folder
 
-=item * rate 
+=item * rate
 
-=item * modified_on 
+=item * modified_on
 
 =back
 
-=cut 
+=cut
 
 sub get_feed_all {
     my ($self) = @_;
 
-    map { WebService::LDR::Response::Feed->new($_) } 
+    map { WebService::LDR::Response::Feed->new($_) }
         @{ $self->_request( '/subs' => { unread => 0 } ) };
 }
 
@@ -330,7 +330,7 @@ Retrieves unread feeds you have subscribed.  Each feed is C<WebService::LDR::Res
 sub get_feed_unread {
     my ($self) = @_;
 
-    map { WebService::LDR::Response::Feed->new($_) } 
+    map { WebService::LDR::Response::Feed->new($_) }
         @{ $self->_request( '/subs' => { unread => 1 } ) };
 }
 
@@ -348,9 +348,9 @@ This method returns C<WebService::LDR::Response::Article>, which has the followi
 
 =over 4
 
-=item * subscribe_id 
+=item * subscribe_id
 
-=item * last_stored_on 
+=item * last_stored_on
 
 =item * channel
 
@@ -428,8 +428,8 @@ sub read {
 
   my $result = $ldr->set_rate($feed => $rate)
 
-Set the rate of specified C<$feed> to C<$rate> (between 1 and 5).  
-C<$feed> can be everything which has C<subscribe_id> method.  
+Set the rate of specified C<$feed> to C<$rate> (between 1 and 5).
+C<$feed> can be everything which has C<subscribe_id> method.
 
 =cut
 
@@ -485,7 +485,7 @@ sub folders {
 
     $ldr->make_folder($folder_name);
 
-Creates folder on Livedoor Reader.  It returns C<WebService::LDR::Response::Result>.  
+Creates folder on Livedoor Reader.  It returns C<WebService::LDR::Response::Result>.
 
 =cut
 
@@ -493,7 +493,7 @@ sub make_folder {
     my ($self, $name) = @_;
 
     Carp::croak "name isn't specified" unless $name;
-    
+
     $self->_require_apiKey;
     WebService::LDR::Response::Result->new(
         $self->_request('/folder/create' => {
@@ -697,7 +697,7 @@ sub _request {
     if ( ! $res || ! $res->is_success ) {
         Carp::croak "POST failed. status=[", $self->{mech}->status, "] status line=[", $res->status_line, "]";
     }
-    
+
     my $json = from_json( $self->{mech}->content, { utf8 => 0 } );
     $DEBUG && debug("$api returns ", Data::Dumper::Dumper($json));
     $json;
@@ -712,9 +712,7 @@ Returns number of unread entries.
 sub unread_cnt {
     my ($self) = @_;
 
-    my $res = $self->_post( $urls->{notify} => {
-        user => $self->{user}
-    });
+    my $res = $self->{mech}->get( $urls->{notify} . '?user=' . $self->{user} );
     my $content = $res->content;
     $DEBUG && debug("content=[$content]");
     my ($cnt) = $content =~ /\|(-?\d+)\|\|/;
@@ -743,7 +741,7 @@ sub _post {
 
 sub _parse_cookie_apikey {
     my ($self) = @_;
-    
+
     $self->{mech}->cookie_jar->scan( sub {
         my ($key, $val) = @_[1,2];
         if ( $key =~ /reader_sid$/ ) {
